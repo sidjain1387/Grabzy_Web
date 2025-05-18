@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import API_with_auth from '../../../api/api_with_auth';
 import { useParams } from 'react-router-dom';
 import { Navigation } from '../Navigation/Navigation';
+import { useApp } from '../../../context/AppContext';  // example path
 
 const MenuList = () => {
     const [menuItems, setMenuItems] = useState([]);
     const [cart, setCart] = useState({});
     const { restaurantId } = useParams();
+    const { cartId } = useApp();  // get cartId from context
 
     useEffect(() => {
         if (restaurantId) {
             fetchMenu();
+            if(cartId) fetchCartItems();  // fetch cart items if cartId available
         }
-    }, [restaurantId]);
+    }, [restaurantId, cartId]);
+
 
     const fetchMenu = async () => {
         try {
@@ -23,32 +27,75 @@ const MenuList = () => {
         }
     };
 
-    const handleAddToCart = (itemId) => {
-        setCart((prevCart) => ({
-            ...prevCart,
-            [itemId]: 1
-        }));
+    const fetchCartItems = async () => {
+        try {
+            const res = await API_with_auth.get(`/cart_items/all/${cartId}`);
+            // Assuming backend sends { items: [{itemId, quantity}, ...]}
+            const items = res.data.items.reduce((acc, item) => {
+                acc[item.itemId] = item.quantity;
+                return acc;
+            }, {});
+            setCart(items);
+        } catch (error) {
+            console.error('Failed to fetch cart items:', error);
+        }
     };
 
-    const handleIncreaseQty = (itemId) => {
-        setCart((prevCart) => ({
-            ...prevCart,
-            [itemId]: prevCart[itemId] + 1
-        }));
-    };
+    const handleAddToCart = async (itemId) => {
+        console.log("cartId 11111:", cartId);
 
-    const handleDecreaseQty = (itemId) => {
-        setCart((prevCart) => {
-            const newQty = prevCart[itemId] - 1;
-            if (newQty <= 0) {
-                const { [itemId]: _, ...rest } = prevCart;
-                return rest;
-            }
-            return {
+        if (!cartId) {
+            alert("Cart not initialized!");
+            return;
+        }
+        try {
+            await API_with_auth.post(`/cart_items/add-item/`, { itemId, quantity: 1, cartId });
+            setCart((prevCart) => ({
                 ...prevCart,
-                [itemId]: newQty
-            };
-        });
+                [itemId]: 1
+            }));
+        } catch (error) {
+            console.error("Failed to add item to cart:", error);
+        }
+    };
+
+    const handleIncreaseQty = async (itemId) => {
+        if (!cartId) return;
+        try {
+            await API_with_auth.put(`/cart_items/increase-qty/`, { itemId, cartId }); // increase by 1
+            setCart((prevCart) => ({
+                ...prevCart,
+                [itemId]: prevCart[itemId] + 1
+            }));
+        } catch (error) {
+            console.error("Failed to increase quantity:", error);
+        }
+    };
+
+    const handleDecreaseQty = async (itemId) => {
+        console.log("cartId 22222:", cartId);
+        if (!cartId) return;
+        try {
+            if (cart[itemId] === 1) {
+                // remove item from cart
+                await API_with_auth.delete(`/cart_items/remove-item/`, {
+                    data: { itemId, cartId }
+                });
+                setCart((prevCart) => {
+                    const { [itemId]: _, ...rest } = prevCart;
+                    return rest;
+                });
+            } else {
+                // decrease quantity by 1
+                await API_with_auth.put(`/cart_items/decrease-qty/`, { itemId, cartId }); // increase by 1
+                setCart((prevCart) => ({
+                    ...prevCart,
+                    [itemId]: prevCart[itemId] - 1
+                }));
+            }
+        } catch (error) {
+            console.error("Failed to decrease quantity:", error);
+        }
     };
 
     return (
@@ -69,12 +116,6 @@ const MenuList = () => {
                                     <p className="text-indigo-600 font-semibold text-lg">₹{item.price}</p>
                                 </div>
                             </div>
-
-                            {/* <p
-                                className={`font-semibold mt-2 ${item.available ? 'text-green-600' : 'text-red-600'}`}
-                            >
-                                {item.available ? 'Available' : 'Unavailable'}
-                            </p> */}
 
                             {item.available && (
                                 <div className="mt-4">
@@ -105,7 +146,6 @@ const MenuList = () => {
                                 </div>
                             )}
                         </div>
-
                     ))}
                 </div>
             </div>

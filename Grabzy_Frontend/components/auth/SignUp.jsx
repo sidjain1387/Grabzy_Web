@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../../api/api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import API_with_auth from '../../api/api_with_auth';
 
 
 const SignUp = () => {
@@ -22,9 +23,11 @@ const SignUp = () => {
     try {
       const res = await API.post('/auth/signup', form);
       localStorage.setItem('token', res.data.token);
+      
       if (res.data.user.role === 'owner') {
         navigate('/owner-dashboard');
       } else {
+        await API_with_auth.post('/cart/create', { userId: res.data.user.user_id });
         navigate('/customer-dashboard'); 
       }
     } catch (err) {

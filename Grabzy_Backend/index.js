@@ -9,6 +9,8 @@ const authenticate = require('./middleware/authenticate');
 const authRoutes = require('./routes/auth/user');
 const restaurantRoutes = require('./routes/restaurant/restaurant');
 const menuRoutes = require('./routes/menu/menu');
+const cartRoutes = require('./routes/cart/cart');
+const cartItemsRoutes = require('./routes/cart/cartItems');
 // const orderRoutes = require('./routes/orders');
 
 // Middleware
@@ -19,6 +21,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurant',authenticate ,restaurantRoutes);
 app.use('/api/menu',authenticate ,menuRoutes);
+app.use('/api/cart',authenticate, cartRoutes);
+app.use('/api/cart_items',authenticate ,cartItemsRoutes);
 // app.use('/api/orders', orderRoutes);
 
 // Default route
