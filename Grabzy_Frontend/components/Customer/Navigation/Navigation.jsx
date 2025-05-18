@@ -17,7 +17,7 @@ export const Navigation = () => {
                 <div className="text-2xl font-bold text-indigo-600">GRABZY</div>
 
                 <div className="flex items-center space-x-4 relative">
-                    <FiShoppingCart className="text-2xl cursor-pointer" />
+                    <FiShoppingCart className="text-2xl cursor-pointer" onClick={()=>navigate('/customer-cart')} />
 
                     <div className="relative">
                         <FiUser
@@ -28,7 +28,7 @@ export const Navigation = () => {
                         {showDropdown && (
                             <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border z-10">
                                 <ul className="py-2">
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={()=>navigate('/customer-profile')}>Profile</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Orders</li>
                                     <li
                                         className="px-4 py-2 hover:bg-red-100 text-red-500 font-semibold cursor-pointer"

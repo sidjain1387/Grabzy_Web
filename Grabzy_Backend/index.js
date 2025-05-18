@@ -11,6 +11,7 @@ const restaurantRoutes = require('./routes/restaurant/restaurant');
 const menuRoutes = require('./routes/menu/menu');
 const cartRoutes = require('./routes/cart/cart');
 const cartItemsRoutes = require('./routes/cart/cartItems');
+const profileRoutes = require('./routes/profile/user_profile');
 // const orderRoutes = require('./routes/orders');
 
 // Middleware
@@ -23,6 +24,7 @@ app.use('/api/restaurant',authenticate ,restaurantRoutes);
 app.use('/api/menu',authenticate ,menuRoutes);
 app.use('/api/cart',authenticate, cartRoutes);
 app.use('/api/cart_items',authenticate ,cartItemsRoutes);
+app.use('/api/profile',authenticate ,profileRoutes);
 // app.use('/api/orders', orderRoutes);
 
 // Default route

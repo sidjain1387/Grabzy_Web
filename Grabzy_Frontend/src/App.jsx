@@ -8,6 +8,9 @@ import ProtectedRoute from '../components/protected/Protected_Route';
 import PublicRoute from '../components/public/public';
 import Customer_Restaurant from '../components/Customer/Restaurant/Restaurant';
 import Customer_Menu from '../components/Customer/Menu/Menu';
+import Customer_Cart from '../components/Customer/Cart/Cart';
+import Customer_Profile from '../components/Customer/Profile/Profile';
+import Customer_Checkout from '../components/Customer/Checkout/Checkout';
 import Owner_Dashboard from '../components/Owner/DashBoard/DashBoard';
 import Owner_Restaurant from '../components/Owner/Restaurant/Restaurant_List';
 import Owner_Add_Restaurant from '../components/Owner/Restaurant/Add_Restaurant';
@@ -27,6 +30,9 @@ function App() {
         <Route path="/customer-dashboard" element={<Customer_Dashboard />} />
         <Route path="/customer-restaurant" element={<Customer_Restaurant />} />
         <Route path="/customer-menu/:restaurantId" element={<Customer_Menu />} />
+        <Route path="/customer-cart" element={<Customer_Cart />} />
+        <Route path="/customer-profile" element={<Customer_Profile />} />
+        <Route path="/customer-checkout" element={<Customer_Checkout />} />
         {/* Add more protected routes here */}
       </Route>
       <Route element={<ProtectedRoute />}>

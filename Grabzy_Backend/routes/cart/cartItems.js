@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../db');
 
-
+// Get all items in a cart
 router.get('/all/:cartId', async (req, res) => {
   const { cartId } = req.params;
 
@@ -17,6 +17,33 @@ router.get('/all/:cartId', async (req, res) => {
     res.json({ items: result.rows });
   } catch (err) {
     console.error('Error fetching cart items:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET ALL CART ITEMS FOR A USER WITH RESTAURANT DETAILS
+router.get('/all_items_with_restaurant/:cartId', async (req, res) => {
+  const { cartId } = req.params;
+
+  try {
+    const query = `
+      SELECT
+        menu_items.item_id AS itemId,
+        menu_items.name AS name,
+        menu_items.price AS price,
+        cart_items.quantity AS quantity,
+        restaurants.name AS restaurant_name
+      FROM cart_items
+      JOIN menu_items ON cart_items.item_id = menu_items.item_id
+      JOIN restaurants ON menu_items.restaurant_id = restaurants.restaurant_id
+      WHERE cart_items.cart_id = $1;
+    `;
+
+    const result = await pool.query(query, [cartId]);
+
+    res.json({ items: result.rows });
+  } catch (err) {
+    console.error('Error fetching cart items:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
